@@ -582,23 +582,21 @@ namespace Confluent.Kafka.Examples
         {
             var timeout = TimeSpan.FromSeconds(30);
             var statesList = new List<ConsumerGroupState>();
+            var groupTypesList = new List<ConsumerGroupType>();
             try
             {
-                if (commandArgs.Length > 0)
+                for (int i = 1; i <= Int32.Parse(commandArgs[0]); i++)
                 {
-                    timeout = TimeSpan.FromSeconds(Int32.Parse(commandArgs[0]));
+                    statesList.Add(Enum.Parse<ConsumerGroupState>(commandArgs[i]));
                 }
-                if (commandArgs.Length > 1)
+                for (int i = Int32.Parse(commandArgs[0])+2; i < commandArgs.Length; i++)
                 {
-                    for (int i = 1; i < commandArgs.Length; i++)
-                    {
-                        statesList.Add(Enum.Parse<ConsumerGroupState>(commandArgs[i]));
-                    }
+                    groupTypesList.Add(Enum.Parse<ConsumerGroupType>(commandArgs[i]));
                 }
             }
             catch (SystemException)
             {
-                Console.WriteLine("usage: .. <bootstrapServers> list-consumer-groups [<timeout_seconds> <match_state_1> <match_state_2> ... <match_state_N>]");
+                Console.WriteLine("usage: .. <bootstrapServers> list-consumer-groups states_cnt [<match_state_1> <match_state_2> ... <match_state_N>] group_types_cnt [<group_type_1> .. <group_type_M>]");
                 Environment.ExitCode = 1;
                 return;
             }
@@ -611,6 +609,7 @@ namespace Confluent.Kafka.Examples
                     { 
                         RequestTimeout = timeout,
                         MatchStates = statesList,
+                        MatchGroupTypes = groupTypesList,
                     });
                     Console.WriteLine(result);
                 }
